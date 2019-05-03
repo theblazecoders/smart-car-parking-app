@@ -36,6 +36,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.14.11"
+  convert:
+    dependency: transitive
+    description:
+      name: convert
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
+  crypt:
+    dependency: "direct main"
+    description:
+      name: crypt
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.7"
+  crypto:
+    dependency: transitive
+    description:
+      name: crypto
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.6"
   cupertino_icons:
     dependency: "direct main"
     description:

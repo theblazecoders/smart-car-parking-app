@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypt/crypt.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -17,7 +19,7 @@ class _SigninPageState extends State<SigninPage> {
   bool _failure;
   String _failureText;
   String _userEmail;
-
+  final key = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +27,7 @@ class _SigninPageState extends State<SigninPage> {
         title: Text("Login / Sign up"),
       ),
       body: ListView(
+        key: key,
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(top: 20.0),
@@ -139,6 +142,14 @@ class _SigninPageState extends State<SigninPage> {
   // Example code for registration.
   void _register() async {
     FirebaseUser user;
+    Scaffold.of(key.currentContext).removeCurrentSnackBar();
+    Scaffold.of(key.currentContext).showSnackBar(SnackBar(
+      content: Text(
+        "Please Wait We are Registering you...",
+        style: TextStyle(color: Colors.black, fontSize: 18),
+      ),
+      backgroundColor: Colors.green,
+    ));
     try {
       user = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
@@ -161,6 +172,22 @@ class _SigninPageState extends State<SigninPage> {
         _userEmail = user.email;
         _successText = user.email + " registered successfully";
       });
+      var encryptedPassword =
+          Crypt.sha256(_passwordController.text + "@1234!").toString();
+      await Firestore.instance
+          .collection("parkingSlotsPassword")
+          .document(user.uid)
+          .setData({
+        'password': encryptedPassword,
+      });
+      Scaffold.of(key.currentContext).removeCurrentSnackBar();
+      Scaffold.of(key.currentContext).showSnackBar(SnackBar(
+        content: Text(
+          "You are registered Successfully",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ),
+        backgroundColor: Colors.green,
+      ));
     } else {
       setState(() {
         _failure = false;
@@ -169,6 +196,13 @@ class _SigninPageState extends State<SigninPage> {
         _successText =
             "An error occured, maybe this account is already created";
       });
+      Scaffold.of(key.currentContext).showSnackBar(SnackBar(
+        content: Text(
+          "An error occured, maybe this account is already created",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ),
+        backgroundColor: Colors.green,
+      ));
     }
   }
 

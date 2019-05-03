@@ -18,21 +18,18 @@ class HomeScreenState extends State<HomeScreen>{
 
   Future<void> getData() async {
 
-    await Firestore.instance.collection("towersInfo").document("totalSize").get().then((value){
-      totalSize = value['occupancy'];
-    });
-    
-    await Firestore.instance.collection("towersInfo").document("numberOfTowers").get().then((value){
-      numberOfTowers = value['numberOfTowers'];
+    await Firestore.instance.collection("towersInfo").document("mainInfo").get().then((value){
+      totalSize = value.data['occupancy'];
+      numberOfTowers = value.data['numberOfTowers'];
     });
 
-    await Firestore.instance.collection("towersInfo").document("towers").get().then((value) {
-      for(int i=0;i<numberOfTowers;i++){
-        int location = value.data['towers'][i]['location'];
-        int occupied = value.data['towers'][i]['occupied'];
-        int availableSlots = value.data['towers'][i]['availableSlots'];
+    Firestore.instance.collection("towersInfo").document("towers").snapshots().listen((value) {
+      towers.clear();
+      for(int i=1;i<=numberOfTowers;i++){
+        int occupied = value.data['tower'+i.toString()]['occupied'];
+        int availableSlots = value.data['tower'+i.toString()]['availableSlots'];
         setState(() {
-          towers.add(new Tower(location,availableSlots,occupied));
+          towers.add(new Tower(i,availableSlots,occupied));
         });
       }
     });
@@ -46,7 +43,6 @@ class HomeScreenState extends State<HomeScreen>{
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: towers.length > 0 ?OrientationBuilder(
@@ -69,7 +65,7 @@ class Tower {
 }
 
 class GridItem extends StatefulWidget {
-  Tower tower;
+  final Tower tower;
 
   GridItem(this.tower);
 

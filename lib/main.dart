@@ -36,7 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _auth.onAuthStateChanged.listen((firebaseUser) {
       if (firebaseUser != null) {
